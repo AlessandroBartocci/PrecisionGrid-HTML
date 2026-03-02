@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #525659; font-family: sans-serif; }
+
+        /* PANNELLO COMANDI */
+        .controls { 
+            position: fixed; top: 0; width: 100%; background: #202124; color: white; 
+            padding: 10px; display: flex; gap: 15px; justify-content: center; align-items: center; z-index: 100;
+        }
+        
+        /* BOX ISTRUZIONI (Sparisce in stampa) */
+        .instructions {
+            position: fixed; top: 60px; left: 50%; transform: translateX(-50%);
+            background: #fff3cd; color: #856404; padding: 10px 20px; border-radius: 5px;
+            border: 1px solid #ffeeba; font-size: 13px; z-index: 99; text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        input, select { padding: 5px; border-radius: 4px; border: none; width: 70px; }
+
+        /* IL FOGLIO */
+        .page {
+            background: white; margin: 140px auto 20px auto; position: relative;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5); width: var(--pw); height: var(--ph);
+        }
+
+        #grid-container {
+            position: absolute; top: 5mm; left: 5mm; right: 5mm; bottom: 5mm;
+            border-top: 0.2pt solid black; border-left: 0.2pt solid black; overflow: hidden;
+        }
+
+        .line { position: absolute; background: black; pointer-events: none; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        .v { width: 0.2pt; height: 100%; }
+        .h { height: 0.2pt; width: 100%; }
+
+        @media print {
+            @page { size: auto; margin: 0mm; }
+            .controls, .instructions { display: none; }
+            body { background: white; }
+            .page { margin: 0; box-shadow: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="controls">
+    <select id="fmt" onchange="draw()">
+        <option value="210,297">A4 Verticale</option>
+        <option value="297,210">A4 Orizzontale</option>
+        <option value="297,420">A3 Verticale</option>
+        <option value="420,297">A3 Orizzontale</option>
+    </select>
+    W (mm): <input type="number" id="wIn" value="5" step="0.1" oninput="draw()">
+    H (mm): <input type="number" id="hIn" value="5" step="0.1" oninput="draw()">
+    <button onclick="window.print()" style="background:#1a73e8; color:white; border:none; padding:8px 15px; border-radius:4px; cursor:pointer; font-weight:bold;">STAMPA</button>
+</div>
+
+<div class="instructions">
+    ⚠️ <b>PER MISURE PRECISE:</b> Nella finestra di stampa imposta 
+    <b>Margini: NESSUNO</b> e 
+    <b>Scala: 100% (o Predefinita)</b>.
+</div>
+
+<div id="page" class="page">
+    <div id="grid-container"></div>
+</div>
+
+<script>
+    function draw() {
+        const fmt = document.getElementById('fmt').value.split(',');
+        const pw = parseFloat(fmt[0]), ph = parseFloat(fmt[1]);
+        const qw = parseFloat(document.getElementById('wIn').value) || 5;
+        const qh = parseFloat(document.getElementById('hIn').value) || 5;
+        
+        const page = document.getElementById('page');
+        const container = document.getElementById('grid-container');
+        
+        page.style.setProperty('--pw', pw + 'mm');
+        page.style.setProperty('--ph', ph + 'mm');
+
+        const innerW = pw - 10; 
+        const innerH = ph - 10;
+
+        let html = '';
+        for (let x = qw; x <= innerW; x += qw) {
+            html += `<div class="line v" style="left:${x}mm"></div>`;
+        }
+        for (let y = qh; y <= innerH; y += qh) {
+            html += `<div class="line h" style="top:${y}mm"></div>`;
+        }
+        
+        container.innerHTML = html;
+    }
+    draw();
+</script>
+</body>
+</html>
