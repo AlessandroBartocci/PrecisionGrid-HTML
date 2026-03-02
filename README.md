@@ -14,7 +14,7 @@ This tool solves common scaling and memory issues found in spreadsheet-based gri
 
 ## Usage
 
-1. Open `Grid.html` in a web browser.
+1. Open `index.html` in a web browser.
 2. Enter the desired square dimensions (e.g., `5` for 5x5mm).
 3. Click **PRINT**.
 
