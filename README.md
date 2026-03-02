@@ -1,40 +1,36 @@
-# 📏 PrecisionGrid-HTML
+# PrecisionGrid-HTML
 
-**Ultra-lightweight millimetric grid generator for high-precision printing.**
+A lightweight, high-precision millimetric grid generator for printing.
 
-Stop fighting with Excel crashes, memory errors, or approximate measurements. This tool leverages native browser vector rendering to generate millimetric grids that are 100% accurate on paper.
+This tool solves common scaling and memory issues found in spreadsheet-based grid generators. It uses native CSS millimetric units and vector rendering to ensure 1:1 physical accuracy on paper.
 
-## 🚀 Why PrecisionGrid?
+## Features
 
-*   **True Metric Precision:** Uses native CSS `mm` units. 1cm on screen = 1cm on paper.
-*   **Zero Installation:** A single, portable HTML file. Works in any modern browser (Chrome, Edge, Firefox).
-*   **Crash-Proof:** Optimized to render long vector lines instead of thousands of individual cells. No more "Out of Memory" errors.
-*   **Built-in Safety Margins:** Automatically includes a 5mm "safe zone" to prevent printers from clipping the grid edges.
-*   **Instant Layouts:** Switch between A4 and A3 (Portrait/Landscape) with one click.
+- **Metric Precision:** Uses native `mm` units. 1cm on screen corresponds to 1cm on paper.
+- **Memory Efficient:** Renders optimized vector lines instead of individual cells to prevent browser or system crashes.
+- **Portable:** Single HTML file. No dependencies, no installation required. Works in Chrome, Edge, and Firefox.
+- **Safety Margins:** Hardcoded 5mm safety buffer to prevent printer clipping.
+- **Multi-Format:** Instant switching between A4/A3 and Portrait/Landscape layouts.
 
-## 🛠️ How to Use
+## Usage
 
-1.  Download the `Grid.html` file.
-2.  Open it with your browser (Chrome or Edge recommended).
-3.  Enter your desired square size (e.g., `5` for 5x5mm).
-4.  Click **PRINT**.
+1. Open `Grid.html` in a web browser.
+2. Enter the desired square dimensions (e.g., `5` for 5x5mm).
+3. Click **PRINT**.
 
-### ⚠️ Critical Print Settings (IMPORTANT)
+### Critical Print Settings
 
-To ensure the measurements remain 100% accurate, you **MUST** configure these in the browser print dialog:
+To maintain physical accuracy, the following browser print settings are mandatory:
 
-*   **Margins:** Set to `None` (or `Nessuno`). The code already handles the 5mm safety margin.
-*   **Scale:** Set to `100%` (or `Default`). **DO NOT** use "Fit to page" or "Fit to area".
-*   **Background Graphics:** Not strictly required (lines are rendered as real objects), but recommended for better visibility.
+- **Margins:** Set to **None**. (The 5mm safety margin is already handled by the code).
+- **Scale:** Set to **100%** (or **Default**). Do not use "Fit to page".
 
-## 📂 Project Structure
+## Technical Specifications
 
-*   `Grid.html`: The main application (HTML5/CSS3/JavaScript).
-*   `README.md`: This documentation file.
+- **Engine:** HTML5 / CSS3 / Vanilla JavaScript.
+- **Rendering:** CSS Grid and absolute positioning for sub-pixel accuracy.
+- **Format Support:** A4 (210x297mm), A3 (297x420mm).
 
-## 📄 License
+## License
 
-Distributed under the MIT License. Feel free to use, modify, and share.
-
----
-*Created to solve the limitations of spreadsheet-based grid printing.*
+Distributed under the MIT License.
