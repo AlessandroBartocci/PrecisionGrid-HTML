@@ -1,36 +1,32 @@
 # PrecisionGrid-HTML
 
-A lightweight, high-precision millimetric grid generator for printing.
+A no-nonsense, high-precision browser tool for designing and printing custom millimetric grids. 
 
-This tool solves common scaling and memory issues found in spreadsheet-based grid generators. It uses native CSS millimetric units and vector rendering to ensure 1:1 physical accuracy on paper.
+Most spreadsheet software or image editors struggle with physical scaling, often resulting in "almost" 5mm squares that drift across the page. **GridDraft** uses internal border calculations to ensure that a 10mm cell is exactly 10mm on paper, period.
 
-## Features
+### Why this?
+- **True-to-Life Scaling**: Built using native CSS millimetric units. The math holds up from screen to paper.
+- **Interactive Workflow**: Draw, paint, and erase cells directly in the browser. It’s a grid generator and a layout editor in one.
+- **Zero Bloat**: A single-file utility. No `npm install`, no tracking, no external dependencies.
+- **Print-First Logic**: Automatically clips "partial" cells that wouldn't fit within a safe printing margin, preventing awkward half-squares at the edge of the page.
 
-- **Metric Precision:** Uses native `mm` units. 1cm on screen corresponds to 1cm on paper.
-- **Memory Efficient:** Renders optimized vector lines instead of individual cells to prevent browser or system crashes.
-- **Portable:** Single HTML file. No dependencies, no installation required. Works in Chrome, Edge, and Firefox.
-- **Safety Margins:** Hardcoded 5mm safety buffer to prevent printer clipping.
-- **Multi-Format:** Instant switching between A4/A3 and Portrait/Landscape layouts.
-
-## Usage
-
-1. Open `index.html` in a web browser.
-2. Enter the desired square dimensions (e.g., `5` for 5x5mm).
-3. Click **PRINT**.
+### Quick Start
+1. Download or copy `index.html`.
+2. Open it in any modern browser (Chrome/Edge recommended).
+3. Define your cell dimensions (e.g., `5 x 5` for standard graph paper).
+4. Use the **Pencil** or **Eraser** to customize your layout.
+5. Hit **Esporta PDF**.
 
 ### Critical Print Settings
+To prevent the browser from shrinking your grid, you **must** use these settings in the print dialog:
+*   **Margins**: None
+*   **Scale**: 100% (or Default)
+*   **Headers/Footers**: Off
 
-To maintain physical accuracy, the following browser print settings are mandatory:
+### Technical Specifications
+- **Engine**: HTML5 / CSS3 / Vanilla JavaScript.
+- **Precision logic**: Uses `box-shadow: inset` for borders. This ensures that the border occupies space *inside* the cell, keeping the external dimensions mathematically perfect.
+- **Layouts**: Supports A4 Portrait and Landscape.
 
-- **Margins:** Set to **None**. (The 5mm safety margin is already handled by the code).
-- **Scale:** Set to **100%** (or **Default**). Do not use "Fit to page".
-
-## Technical Specifications
-
-- **Engine:** HTML5 / CSS3 / Vanilla JavaScript.
-- **Rendering:** CSS Grid and absolute positioning for sub-pixel accuracy.
-- **Format Support:** A4 (210x297mm), A3 (297x420mm).
-
-## License
-
-Distributed under the MIT License.
+### License
+Distributed under the **MIT License**.
