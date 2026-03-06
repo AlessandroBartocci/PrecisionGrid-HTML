@@ -2,46 +2,97 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Grid Editor</title>
     <style>
+        :root { --border-width: 0.2mm; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #525659; font-family: sans-serif; }
+        
+        body { 
+            background: #525659; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            overflow-x: hidden; 
+        }
 
-        /* PANNELLO COMANDI */
+        /* Toolbar superiore */
         .controls { 
             position: fixed; top: 0; width: 100%; background: #202124; color: white; 
-            padding: 10px; display: flex; gap: 15px; justify-content: center; align-items: center; z-index: 100;
+            padding: 12px; display: flex; gap: 15px; justify-content: center; align-items: center; 
+            z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.4);
         }
-        
-        /* BOX ISTRUZIONI (Sparisce in stampa) */
+
+        /* Pannello Istruzioni */
         .instructions {
-            position: fixed; top: 60px; left: 50%; transform: translateX(-50%);
-            background: #fff3cd; color: #856404; padding: 10px 20px; border-radius: 5px;
-            border: 1px solid #ffeeba; font-size: 13px; z-index: 99; text-align: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: fixed; top: 85px; left: 20px; width: 240px; background: #ffffff; 
+            color: #202124; padding: 18px; border-radius: 8px; border-left: 5px solid #1a73e8; 
+            font-size: 13px; z-index: 1001; box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            line-height: 1.5;
         }
 
-        input, select { padding: 5px; border-radius: 4px; border: none; width: 70px; }
+        /* Palette Colori Professionale */
+        .palette { display: flex; gap: 6px; align-items: center; background: #3c4043; padding: 6px 12px; border-radius: 8px; }
+        .swatch { 
+            width: 26px; height: 26px; border-radius: 4px; cursor: pointer; 
+            border: 2px solid rgba(255,255,255,0.1); transition: all 0.15s ease;
+        }
+        .swatch:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.5); }
+        .swatch.active { border-color: white; transform: scale(1.1); box-shadow: 0 0 10px rgba(255,255,255,0.3); }
+        #colorIn { width: 30px; height: 30px; padding: 0; cursor: pointer; background: none; border: none; margin-left: 5px; }
 
-        /* IL FOGLIO */
+        /* Input e Bottoni */
+        input[type="number"], select { background: #3c4043; color: white; border: 1px solid #5f6368; padding: 6px; border-radius: 4px; width: 70px; outline: none; }
+        input:focus { border-color: #1a73e8; }
+        
+        .btn { cursor: pointer; font-weight: 600; padding: 8px 16px; border-radius: 4px; border: none; transition: 0.2s; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .btn-tool { background: #444; color: #bdc1c6; }
+        .btn-tool.active { background: #fbbc04; color: #202124; }
+        .btn-clear { background: #ea4335; color: white; }
+        .btn-print { background: #1a73e8; color: white; }
+        .btn:hover:not(.active) { filter: brightness(1.2); }
+
+        /* Area Foglio e Griglia */
+        .page-container {
+            margin: 160px auto 60px auto;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
         .page {
-            background: white; margin: 140px auto 20px auto; position: relative;
-            box-shadow: 0 0 15px rgba(0,0,0,0.5); width: var(--pw); height: var(--ph);
+            background: white;
+            width: var(--pw); height: var(--ph);
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden; /* Taglia le celle che non entrano perfettamente */
         }
 
         #grid-container {
-            position: absolute; top: 5mm; left: 5mm; right: 5mm; bottom: 5mm;
-            border-top: 0.2pt solid black; border-left: 0.2pt solid black; overflow: hidden;
+            display: grid;
+            grid-template-columns: repeat(var(--cols), var(--qw));
+            grid-template-rows: repeat(var(--rows), var(--qh));
+            /* Il bordo esterno chiude la griglia senza spostare il layout */
+            outline: var(--border-width) solid black;
         }
 
-        .line { position: absolute; background: black; pointer-events: none; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-        .v { width: 0.2pt; height: 100%; }
-        .h { height: 0.2pt; width: 100%; }
+        .cell { 
+            width: var(--qw);
+            height: var(--qh);
+            /* Bordo interno: non occupa spazio fisico nel calcolo millimetrico */
+            box-shadow: inset 0 0 0 var(--border-width) black;
+            background: transparent;
+            transition: background 0.05s ease;
+        }
+
+        .pencil-mode { cursor: crosshair; }
+        .eraser-mode { cursor: cell; }
 
         @media print {
-            @page { size: auto; margin: 0mm; }
+            @page { margin: 0; }
+            body { background: white; margin: 0; }
             .controls, .instructions { display: none; }
-            body { background: white; }
-            .page { margin: 0; box-shadow: none; }
+            .page-container { margin: 0; padding: 0; }
+            .page { box-shadow: none; margin: 0; }
+            .cell { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
     </style>
 </head>
@@ -51,50 +102,122 @@
     <select id="fmt" onchange="draw()">
         <option value="210,297">A4 Verticale</option>
         <option value="297,210">A4 Orizzontale</option>
-        <option value="297,420">A3 Verticale</option>
-        <option value="420,297">A3 Orizzontale</option>
     </select>
-    W (mm): <input type="number" id="wIn" value="5" step="0.1" oninput="draw()">
-    H (mm): <input type="number" id="hIn" value="5" step="0.1" oninput="draw()">
-    <button onclick="window.print()" style="background:#1a73e8; color:white; border:none; padding:8px 15px; border-radius:4px; cursor:pointer; font-weight:bold;">STAMPA</button>
+    
+    <div style="font-size: 11px; color: #9aa0a6;">DIM. CELLA (mm)</div>
+    <input type="number" id="wIn" value="10" step="0.5" oninput="draw()">
+    <span>×</span>
+    <input type="number" id="hIn" value="10" step="0.5" oninput="draw()">
+
+    <div class="palette">
+        <div class="swatch active" style="background: #1a73e8" onclick="selectColor('#1a73e8', this)"></div>
+        <div class="swatch" style="background: #d93025" onclick="selectColor('#d93025', this)"></div>
+        <div class="swatch" style="background: #188038" onclick="selectColor('#188038', this)"></div>
+        <div class="swatch" style="background: #fbbc04" onclick="selectColor('#fbbc04', this)"></div>
+        <div class="swatch" style="background: #7030a0" onclick="selectColor('#7030a0', this)"></div>
+        <div class="swatch" style="background: #000000" onclick="selectColor('#000000', this)"></div>
+        <input type="color" id="colorIn" value="#1a73e8" oninput="selectColor(this.value)">
+    </div>
+    
+    <button id="pencilBtn" class="btn btn-tool active" onclick="setTool('pencil')">Matita</button>
+    <button id="eraserBtn" class="btn btn-tool" onclick="setTool('eraser')">Gomma</button>
+    <button class="btn btn-clear" onclick="clearGrid()">Reset</button>
+    <button class="btn btn-print" onclick="window.print()">Esporta PDF</button>
 </div>
 
 <div class="instructions">
-    ⚠️ <b>PER MISURE PRECISE:</b> Nella finestra di stampa imposta 
-    <b>Margini: NESSUNO</b> e 
-    <b>Scala: 100% (o Predefinita)</b>.
+    <strong style="color:#1a73e8; font-size: 15px;">STRUMENTI DI PRECISIONE</strong><br><br>
+    • <b>Misure Reali:</b> I bordi sono calcolati internamente per garantire precisione al decimo di millimetro.<br><br>
+    • <b>Workflow:</b> Trascina per colorare. Solo le celle intere che entrano nel foglio (meno 10mm di margine di sicurezza) vengono generate.<br><br>
+    • <b>Stampa:</b> Imposta "Scala: Predefinito" e "Margini: Nessuno".
 </div>
 
-<div id="page" class="page">
-    <div id="grid-container"></div>
+<div class="page-container">
+    <div id="page" class="page">
+        <div id="grid-container" class="pencil-mode"></div>
+    </div>
 </div>
 
 <script>
+    let isMouseDown = false;
+    let currentTool = 'pencil';
+    let currentColor = '#1a73e8';
+
+    window.addEventListener('mousedown', () => isMouseDown = true);
+    window.addEventListener('mouseup', () => isMouseDown = false);
+    window.addEventListener('dragstart', (e) => e.preventDefault());
+
+    function selectColor(color, element) {
+        currentColor = color;
+        document.getElementById('colorIn').value = color;
+        document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+        if(element) element.classList.add('active');
+        setTool('pencil');
+    }
+
+    function setTool(tool) {
+        currentTool = tool;
+        document.querySelectorAll('.btn-tool').forEach(b => b.classList.remove('active'));
+        const container = document.getElementById('grid-container');
+        if(tool === 'pencil') {
+            document.getElementById('pencilBtn').classList.add('active');
+            container.className = 'pencil-mode';
+        } else {
+            document.getElementById('eraserBtn').classList.add('active');
+            container.className = 'eraser-mode';
+        }
+    }
+
+    function applyAction(cell) {
+        if (currentTool === 'pencil') {
+            cell.style.backgroundColor = currentColor;
+        } else {
+            cell.style.backgroundColor = 'transparent';
+        }
+    }
+
+    function clearGrid() {
+        if(confirm("Sei sicuro di voler cancellare tutto il lavoro?")) {
+            document.querySelectorAll('.cell').forEach(c => c.style.backgroundColor = 'transparent');
+        }
+    }
+
     function draw() {
-        const fmt = document.getElementById('fmt').value.split(',');
-        const pw = parseFloat(fmt[0]), ph = parseFloat(fmt[1]);
-        const qw = parseFloat(document.getElementById('wIn').value) || 5;
-        const qh = parseFloat(document.getElementById('hIn').value) || 5;
+        const fmtVal = document.getElementById('fmt').value.split(',');
+        const pw = parseFloat(fmtVal[0]); 
+        const ph = parseFloat(fmtVal[1]);
+        const qw = parseFloat(document.getElementById('wIn').value) || 10;
+        const qh = parseFloat(document.getElementById('hIn').value) || 10;
         
         const page = document.getElementById('page');
         const container = document.getElementById('grid-container');
         
+        // Imposta dimensioni foglio
         page.style.setProperty('--pw', pw + 'mm');
         page.style.setProperty('--ph', ph + 'mm');
 
-        const innerW = pw - 10; 
-        const innerH = ph - 10;
-
-        let html = '';
-        for (let x = qw; x <= innerW; x += qw) {
-            html += `<div class="line v" style="left:${x}mm"></div>`;
-        }
-        for (let y = qh; y <= innerH; y += qh) {
-            html += `<div class="line h" style="top:${y}mm"></div>`;
-        }
+        // Calcolo celle basato sullo spazio netto (margine tecnico di 5mm per lato)
+        const cols = Math.floor((pw - 10) / qw);
+        const rows = Math.floor((ph - 10) / qh);
         
-        container.innerHTML = html;
+        container.style.setProperty('--cols', cols);
+        container.style.setProperty('--rows', rows);
+        container.style.setProperty('--qw', qw + 'mm');
+        container.style.setProperty('--qh', qh + 'mm');
+
+        container.innerHTML = '';
+        const fragment = document.createDocumentFragment();
+
+        for (let i = 0; i < cols * rows; i++) {
+            const cell = document.createElement('div');
+            cell.className = 'cell';
+            cell.onmousedown = (e) => { isMouseDown = true; applyAction(cell); };
+            cell.onmouseenter = () => { if(isMouseDown) applyAction(cell); };
+            fragment.appendChild(cell);
+        }
+        container.appendChild(fragment);
     }
+
     draw();
 </script>
 </body>
