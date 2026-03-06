@@ -15,7 +15,7 @@ Most spreadsheet software or image editors struggle with physical scaling, often
 2. Open it in any modern browser (Chrome/Edge recommended).
 3. Define your cell dimensions (e.g., `5 x 5` for standard graph paper).
 4. Use the **Pencil** or **Eraser** to customize your layout.
-5. Hit **Esporta PDF**.
+5. Hit **Print**.
 
 ### Critical Print Settings
 To prevent the browser from shrinking your grid, you **must** use these settings in the print dialog:
