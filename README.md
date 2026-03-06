@@ -2,7 +2,7 @@
 
 A no-nonsense, high-precision browser tool for designing and printing custom millimetric grids. 
 
-Most spreadsheet software or image editors struggle with physical scaling, often resulting in "almost" 5mm squares that drift across the page. **GridDraft** uses internal border calculations to ensure that a 10mm cell is exactly 10mm on paper, period.
+Most spreadsheet software or image editors struggle with physical scaling, often resulting in "almost" 5mm squares that drift across the page. **PrecisionGrid-HTML** uses internal border calculations to ensure that a 10mm cell is exactly 10mm on paper, period.
 
 ### Why this?
 - **True-to-Life Scaling**: Built using native CSS millimetric units. The math holds up from screen to paper.
